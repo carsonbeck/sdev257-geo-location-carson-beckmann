@@ -1,6 +1,6 @@
 import * as Location from "expo-location";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 
 export default function WhereAmI() {
@@ -17,40 +17,40 @@ export default function WhereAmI() {
     useEffect(() => {
         let watcher;
 
-    async function setPosition({ coords: { latitude, longitude } }) {
-        setRegion({
-            latitude,
-            longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-        });
-    }
-
-    (async () => {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if(status !== "granted") {
-            setErrorMsg("Permission to access location was denied");
-            return;
+        async function setPosition({ coords: { latitude, longitude } }) {
+            setRegion({
+                latitude,
+                longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+            });
         }
 
-        let location = await Location.getCurrentPositionAsync({});
-        setPosition(location);
+        (async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== "granted") {
+                setErrorMsg("Permission to access location was denied");
+                return;
+            }
 
-        watcher = await Location.watchPositionAsync(
-            { accuracy: Location.LocationAccuracy.Highest },
-            setPosition
-        );
-    })();
+            let location = await Location.getCurrentPositionAsync({});
+            setPosition(location);
+
+            watcher = await Location.watchPositionAsync(
+                { accuracy: Location.LocationAccuracy.Highest },
+                setPosition
+            );
+        })();
 
         return () => {
             if (watcher) watcher.remove();
         };
     }, []);
-    
-    if (errorMsg) {
+
+    if (errMsg) {
         return (
             <View style={styles.container}>
-                <Text style={styles.error}>{errorMsg}</Text>
+                <Text style={styles.error}>{errMsg}</Text>
             </View>
         );
     }
